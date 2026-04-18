@@ -1,5 +1,3 @@
-// Authentication Controller
-auth.controller.js
 const authService = require('../services/auth.service');
 const { successResponse } = require('../utils/helpers');
 
