@@ -1,9 +1,10 @@
-// Product Routes
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/product.controller');
+const { getProducts, getProductById, getFilterOptions } = require('../controllers/product.controller');
 
-router.get('/', productController.getProducts);
-router.get('/:id', productController.getProductById);
+// All product routes are PUBLIC — no protect middleware
+router.get('/',        getProducts);
+router.get('/filters', getFilterOptions);
+router.get('/:id',     getProductById);
 
 module.exports = router;
