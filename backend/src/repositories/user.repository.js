@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
 
 const findByEmail = async (email) => {
-  return User.findOne({ email }).select('+password');
+  return User.findOne({ email: email.toLowerCase().trim() }).select('+password');
 };
 
 const findById = async (id) => {
@@ -13,7 +13,7 @@ const create = async (data) => {
 };
 
 const emailExists = async (email) => {
-  const count = await User.countDocuments({ email });
+  const count = await User.countDocuments({ email: email.toLowerCase().trim() });
   return count > 0;
 };
 
