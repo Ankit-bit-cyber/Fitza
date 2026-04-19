@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user.model');
 const userRepository = require('../repositories/user.repository');
 
 class AuthService {
@@ -21,20 +22,28 @@ class AuthService {
   }
 
   async login({ email, password }) {
-    const user = await userRepository.findByEmail(email);
+    const user = await User.findOne({ 
+      email: email.toLowerCase().trim() 
+    }).select('+password');
+
     if (!user) {
       const err = new Error('Invalid email or password.');
       err.statusCode = 401;
       throw err;
     }
-    const match = await user.comparePassword(password);
-    if (!match) {
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
       const err = new Error('Invalid email or password.');
       err.statusCode = 401;
       throw err;
     }
+
     const token = this._generateToken(user._id);
-    return { user, token };
+    const userObj = user.toJSON(); // password removed by toJSON()
+
+    return { user: userObj, token };
   }
 
   async getProfile(userId) {
