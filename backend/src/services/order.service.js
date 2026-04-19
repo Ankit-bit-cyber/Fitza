@@ -1,11 +1,13 @@
-const orderRepository = require('../repositories/order.repository');
-const cartRepository = require('../repositories/cart.repository');
+const mongoose = require('mongoose');
+const Order = require('../models/order.model');
+const Cart = require('../models/cart.model');
 
 class OrderService {
   async createOrder(userId, shippingAddress) {
-    const cart = await cartRepository.findByUser(userId);
-    if (!cart || cart.items.length === 0) {
-      const err = new Error('Cart is empty.');
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+      const err = new Error('Cart is empty. Add items before placing an order.');
       err.statusCode = 400;
       throw err;
     }
@@ -14,27 +16,35 @@ class OrderService {
       product: item.product._id || item.product,
       quantity: item.quantity,
       price: item.price,
-      name: item.product.name || '',
-      imageUrl: item.product.imageUrl || '',
+      name: item.product?.name || '',
+      imageUrl: item.product?.imageUrl || '',
     }));
 
-    const order = await orderRepository.create({
+    const order = await Order.create({
       user: userId,
       items: orderItems,
       totalPrice: cart.totalPrice,
       shippingAddress: shippingAddress || {},
+      status: 'pending',
     });
 
-    await cartRepository.deleteByUser(userId);
+    await Cart.findOneAndDelete({ user: userId });
     return order;
   }
 
   async getMyOrders(userId) {
-    return orderRepository.findByUser(userId);
+    const userIdStr = userId.toString();
+    const all = await Order.find({})
+      .populate('items.product', 'name imageUrl brand')
+      .sort('-createdAt')
+      .lean();
+    return all.filter(o => o.user.toString() === userIdStr);
   }
 
   async getOrderById(orderId) {
-    const order = await orderRepository.findById(orderId);
+    const order = await Order.findById(orderId)
+      .populate('items.product')
+      .lean();
     if (!order) {
       const err = new Error('Order not found.');
       err.statusCode = 404;

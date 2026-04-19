@@ -4,7 +4,6 @@ const cartService = require('../services/cart.service');
 const getCart = async (req, res, next) => {
   try {
     const cart = await cartService.getCart(req.user._id);
-    console.log('CART DEBUG:', JSON.stringify(cart, null, 2)); // ← ADD THIS
     return successResponse(res, { cart });
   } catch (err) { next(err); }
 };
@@ -12,9 +11,7 @@ const getCart = async (req, res, next) => {
 const addItem = async (req, res, next) => {
   try {
     const { productId, quantity } = req.body;
-    console.log('ADD ITEM:', productId, quantity, 'user:', req.user._id); // ← ADD THIS
     const cart = await cartService.addItem(req.user._id, productId, quantity);
-    console.log('CART AFTER ADD:', JSON.stringify(cart, null, 2)); // ← ADD THIS
     return successResponse(res, { cart }, 'Item added to cart.');
   } catch (err) { next(err); }
 };
