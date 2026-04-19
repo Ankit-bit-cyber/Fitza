@@ -260,21 +260,6 @@ npm start
 | `carts` | `user (ref)`, `items[]`, `totalPrice` |
 | `orders` | `user (ref)`, `items[]`, `totalPrice`, `status` |
 
----
-
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `PORT` | ✅ | — | Server port |
-| `MONGO_URI` | ✅ | — | MongoDB connection string |
-| `JWT_SECRET` | ✅ | — | JWT signing secret |
-| `JWT_EXPIRES_IN` | ❌ | `7d` | Token expiry |
-| `NODE_ENV` | ❌ | `development` | Environment |
-| `CLIENT_URL` | ❌ | — | Frontend URL for CORS |
-
----
-
 
 ---
 
